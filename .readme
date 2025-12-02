@@ -1,0 +1,56 @@
+cv-builder-backend
+
+Project overview
+- Simple backend for a CV/resume builder application using Express, Mongoose and authentication.
+- Uses an in-memory MongoDB (`mongodb-memory-server`) for development/testing by default.
+
+Prerequisites
+- Node.js (v14+ recommended)
+- npm
+
+Quick start
+1. Install dependencies
+
+   npm install
+
+2. Create a `.env` file in the project root if you need to override defaults. Available environment variables (optional):
+- `PORT` — port to run the server (default: `5000`)
+- `JWT_SECRET` — secret used for signing JWTs (default in code: `'secret'`)
+- `GOOGLE_CLIENT_ID` — Google OAuth client ID (used for Google sign-in)
+
+Note: The project uses an in-memory MongoDB for development (`mongodb-memory-server`). No `MONGO_URI` is required for local dev; data will not persist between runs.
+
+Run the app
+- Development (uses `nodemon`):
+
+   npm run dev
+
+- Production / start:
+
+   npm start
+
+Project structure (top-level)
+- `server.js` — application entrypoint
+- `config/` — configuration (DB, passport)
+- `controllers/` — route handlers
+- `routes/` — express routes
+- `models/` — mongoose models (`User.js`, `CV.js`)
+- `middleware/` — auth and validation middleware
+- `utils/` — helpers (email, pdf)
+
+API notes
+- Authentication uses JWTs. Look for `authRoutes.js` and `authController.js` for endpoints such as register, login, and OAuth handlers.
+- CV routes are under `cvRoutes.js` and managed by `cvController.js`.
+- Payment-related routes are under `paymentRoutes.js`.
+
+Testing & development tips
+- Because MongoDB runs in-memory for dev, restart the server to reset the data.
+- Add any cloud provider credentials (e.g., Cloudinary, email SMTP) to `.env` and update the relevant `utils/` files if you integrate them.
+
+Next steps
+- Add a `README.md` if you prefer markdown with badges and richer formatting.
+- Add `.env.example` listing recommended env variables for contributors.
+
+If you'd like, I can also:
+- Create a `README.md` (markdown) version.
+- Generate an `.env.example` file with suggested keys.
