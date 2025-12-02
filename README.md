@@ -1,180 +1,298 @@
-# CV Builder — Backend
+# CV Builder Backend
 
-This README provides a general, ready-to-edit template for a backend that serves a CV Builder application. Adjust the examples and environment variables to match your actual backend implementation.
+A robust Express.js backend for a CV/Resume builder application with user authentication, CV management, and payment integration support.
 
-## Overview
+## 📋 Table of Contents
 
-Backend for the CV Builder app. Responsibilities include:
-- User authentication (register, login, profile)
-- CRUD for CVs/resumes and their sections (personal, education, experience, projects, skills, social links)
-- PDF generation of CVs
-- Optional payment or premium feature handling
-- File upload (profile images, attachments)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [API Endpoints](#api-endpoints)
+- [Environment Variables](#environment-variables)
+- [Authentication](#authentication)
+- [Development Tips](#development-tips)
+- [Contributing](#contributing)
 
-## Features
+## ✨ Features
 
-- RESTful JSON API
-- JWT-based authentication
-- File uploads (e.g., profile pictures)
-- PDF generation (server-side)
-- Optional integration with payment gateway (Stripe, Razorpay, etc.)
-- Rate limiting / basic security best practices suggested
+- **User Authentication**: JWT-based authentication with Google OAuth support
+- **CV Management**: Create, read, update, and delete CV records
+- **Public Sharing**: Share CVs publicly via unique URLs
+- **Password Security**: Bcrypt hashing for secure password storage
+- **OAuth Integration**: Google and Facebook authentication support
+- **Email Service**: Nodemailer integration for email notifications
+- **PDF Generation**: Convert CVs to PDF format
+- **Cloud Storage**: Cloudinary integration for image uploads
+- **Input Validation**: Express-validator for request validation
+- **CORS Support**: Cross-Origin Resource Sharing enabled
+- **In-Memory Database**: MongoDB Memory Server for development/testing
 
-## Tech Stack (example)
+## 🛠️ Tech Stack
 
-- Node.js + Express
-- MongoDB / PostgreSQL (replace if needed)
-- Mongoose or Prisma (ORM/ODM)
-- JSON Web Tokens (JWT) for auth
-- Multer for file uploads
-- A PDF library (e.g., Puppeteer, pdfkit) for PDF generation
+- **Runtime**: Node.js
+- **Framework**: Express.js 5.x
+- **Database**: MongoDB (with in-memory server for dev)
+- **ODM**: Mongoose 9.x
+- **Authentication**: 
+  - JWT (jsonwebtoken)
+  - Passport.js with Google & Facebook strategies
+- **Utilities**:
+  - bcryptjs - password hashing
+  - nodemailer - email service
+  - multer - file uploads
+  - cloudinary - cloud storage
+  - dotenv - environment configuration
 
-## Prerequisites
+## 📦 Prerequisites
 
-- Node.js (v16+ recommended)
-- npm or yarn
-- A database (MongoDB, Postgres, etc.)
-- Optional: Docker and docker-compose
+- Node.js v14 or higher
+- npm v6 or higher
+- A GitHub account (for the repository)
+- Google OAuth credentials (optional, for Google login)
+- Facebook OAuth credentials (optional, for Facebook login)
 
-## Getting Started (development)
+## 🚀 Installation
 
-1. Clone the repo (or ensure backend code is present in this folder):
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Prafullahire/Neosoft_CV_Builder_Backend.git
+   cd Neosoft_CV_Builder_Backend
+   ```
 
-```bash
-git clone <repo-url>
-cd <backend-folder>
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Create a `.env` file** in the project root
+   ```bash
+   cp .env.example .env
+   ```
+   (See [Configuration](#configuration) section below)
+
+4. **Verify installation**
+   ```bash
+   npm run dev
+   ```
+   The server should start on `http://localhost:5000`
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+# Server
+PORT=5000
+NODE_ENV=development
+
+# JWT
+JWT_SECRET=your_jwt_secret_key_here
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id_here
+
+# Email Service (Nodemailer)
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_app_password_here
+
+# Cloudinary
+CLOUDINARY_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Optional: Facebook OAuth
+FACEBOOK_APP_ID=your_facebook_app_id
+FACEBOOK_APP_SECRET=your_facebook_app_secret
 ```
 
-2. Install dependencies:
+### Important Notes
 
-```bash
-npm install
-# or
-yarn install
-```
+- **JWT_SECRET**: Use a strong, random string in production
+- **Database**: Uses `mongodb-memory-server` for local development (data not persisted)
+- **Google OAuth**: Get credentials from [Google Cloud Console](https://console.cloud.google.com/)
+- **Email Service**: Use Gmail with [app-specific passwords](https://myaccount.google.com/apppasswords)
 
-3. Create an `.env` file (see example below)
+## ▶️ Running the Application
 
-4. Run the development server:
-
+### Development Mode (with auto-reload)
 ```bash
 npm run dev
-# or
+```
+
+### Production Mode
+```bash
 npm start
 ```
 
-Server should run on the port specified in `PORT` (default `3000` or `5000`).
+The API will be available at `http://localhost:5000`
 
-## Environment Variables (example `.env`)
+## 📁 Project Structure
 
 ```
-PORT=5000
-NODE_ENV=development
-DATABASE_URL=mongodb://localhost:27017/cv_builder
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRES_IN=7d
-UPLOADS_DIR=./uploads
-STRIPE_SECRET_KEY=sk_test_...
+cv-builder-backend/
+├── config/
+│   ├── db.js                 # MongoDB connection setup
+│   └── passport.js           # Passport.js configuration
+├── controllers/
+│   ├── authController.js     # Authentication logic
+│   ├── cvController.js       # CV CRUD operations
+│   └── paymentController.js  # Payment handling
+├── middleware/
+│   ├── auth.js               # JWT verification middleware
+│   └── validation.js         # Request validation middleware
+├── models/
+│   ├── User.js               # User schema
+│   └── CV.js                 # CV schema
+├── routes/
+│   ├── authRoutes.js         # Authentication endpoints
+│   ├── cvRoutes.js           # CV management endpoints
+│   └── paymentRoutes.js      # Payment endpoints
+├── utils/
+│   ├── emailService.js       # Email sending utility
+│   └── pdfService.js         # PDF generation utility
+├── data/
+│   └── db/                   # Database seeds/fixtures
+├── .env.example              # Environment variables template
+├── .gitignore                # Git ignore rules
+├── server.js                 # Application entry point
+├── package.json              # Project dependencies
+└── README.md                 # This file
 ```
 
-Adjust values to match your database and secrets.
+## 🔌 API Endpoints
 
-## API — Common Endpoints (examples)
+### Authentication Routes (`/api/auth`)
 
-- Auth
-  - `POST /api/auth/register` — Register a new user
-  - `POST /api/auth/login` — Login and receive JWT
-  - `GET /api/auth/me` — Get current user (requires `Authorization: Bearer <token>`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| POST | `/register` | Register a new user | ❌ |
+| POST | `/login` | Login with email and password | ❌ |
+| POST | `/google` | Google OAuth authentication | ❌ |
 
-- Users
-  - `GET /api/users/:id` — Get user profile
-  - `PUT /api/users/:id` — Update profile (auth required)
-
-- CVs
-  - `POST /api/cvs` — Create a CV (auth required)
-  - `GET /api/cvs` — List user's CVs (auth required)
-  - `GET /api/cvs/:id` — Get CV by id
-  - `PUT /api/cvs/:id` — Update CV
-  - `DELETE /api/cvs/:id` — Delete CV
-
-- PDF
-  - `GET /api/cvs/:id/pdf` — Get generated PDF for CV
-
-- Uploads
-  - `POST /api/uploads` — Upload files (multipart/form-data)
-
-Return formats should be JSON; errors should use standard HTTP status codes.
-
-## Authentication
-
-- Use `Authorization: Bearer <token>` header for protected routes
-- Token issuance on login and registration
-- Token verification middleware to protect endpoints
-
-## File Uploads
-
-- Use `multipart/form-data`
-- Store uploads in `UPLOADS_DIR` or cloud storage (S3, GCS)
-- Validate file types and sizes server-side
-
-## PDF Generation
-
-- Generate HTML templates for CVs and render to PDF (e.g., Puppeteer)
-- Provide an endpoint that streams the PDF back to the client
-
-## Database
-
-- Provide migrations or schema files (if using SQL)
-- For MongoDB, provide seed scripts if necessary
-
-## Tests
-
-- Add unit and integration tests (Jest, Supertest for Node/Express)
-- Example: `npm test`
-
-## Docker (optional)
-
-Provide a `Dockerfile` and `docker-compose.yml` for the app and DB. Example commands:
-
+**Example: Register User**
 ```bash
-# build
-docker build -t cv-builder-backend .
-# run with docker-compose
-docker-compose up
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "securepassword123"
+  }'
 ```
 
-## Deployment
+**Example: Login**
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "securepassword123"
+  }'
+```
 
-- Use environment variables for secrets
-- Use a process manager (PM2) or container orchestrator
-- Store uploads in cloud storage rather than local disk in production
+### CV Routes (`/api/cvs`)
 
-## Security & Best Practices
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---|
+| GET | `/` | Get all CVs for logged-in user | ✅ |
+| POST | `/` | Create a new CV | ✅ |
+| GET | `/:id` | Get a specific CV by ID | ✅ |
+| PUT | `/:id` | Update a CV | ✅ |
+| DELETE | `/:id` | Delete a CV | ✅ |
+| GET | `/public/:id` | Get a CV publicly (sharable link) | ❌ |
 
-- Never commit secrets to source control
-- Validate and sanitize inputs
-- Use HTTPS in production
-- Rate limit endpoints and add CORS configuration
+**Example: Create CV (Authenticated)**
+```bash
+curl -X POST http://localhost:5000/api/cvs \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "title": "My Professional CV",
+    "personalInfo": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567890"
+    },
+    "experience": [],
+    "education": []
+  }'
+```
 
-## Contributing
+**Example: Get Public CV (No Auth)**
+```bash
+curl http://localhost:5000/api/cvs/public/60f7b3c4e8f2a1b9c3d4e5f6
+```
 
-- Fork the repo and open a PR with changes
-- Follow the existing code style and add tests for new behavior
+## 🔐 Authentication
 
-## Troubleshooting
+### JWT Workflow
 
-- If DB connection fails: check `DATABASE_URL` and DB status
-- If file uploads fail: check permissions on `UPLOADS_DIR`
+1. **Register/Login**: User receives a JWT token
+2. **Store Token**: Client stores token (localStorage, cookies, etc.)
+3. **Protected Requests**: Include token in `Authorization` header
+4. **Token Format**:
+   ```
+   Authorization: Bearer <JWT_TOKEN>
+   ```
 
-## Contact / Authors
+### Middleware
 
-- Project: CV Builder
-- Maintainer: adapt to your team details
+The `protect` middleware in `middleware/auth.js` verifies the JWT token on protected routes. If token is invalid or missing, the request is rejected with a 401 status.
 
-## License
+## 💡 Development Tips
 
-Specify your license (e.g., MIT) or remove this section.
+### Testing API Endpoints
 
----
+Use [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) for testing:
 
-Note: This README is a template for a backend service. Please update endpoint URIs, commands, and environment variables to match the actual backend implementation and folder structure in your repository.
+1. Set `Authorization` header to `Bearer <your_jwt_token>`
+2. Test protected endpoints after login/register
+3. Use the `/public/:id` endpoint to test public sharing
+
+### Database Reset
+
+Since the app uses an in-memory MongoDB:
+- Data persists only during a server session
+- Restart the server to reset the database: `npm run dev`
+
+### Debugging
+
+Enable detailed logging by checking `console.log` statements:
+- `config/db.js` - MongoDB connection
+- `controllers/authController.js` - Auth flow
+- `controllers/cvController.js` - CV operations
+
+### Email Testing
+
+For development, consider using:
+- [Ethereal Email](https://ethereal.email/) - free test email account
+- Update `EMAIL_USER` and `EMAIL_PASSWORD` in `.env`
+
+## 🐛 Common Issues
+
+### Issue: "JWT_SECRET is undefined"
+**Solution**: Add `JWT_SECRET=your_secret` to `.env`
+
+### Issue: "MongoDB Connection Error"
+**Solution**: Ensure `mongodb-memory-server` is installed via `npm install`
+
+### Issue: "CORS errors"
+**Solution**: Ensure frontend is on allowed origin (configure in `server.js` if needed)
+
+### Issue: "Google OAuth fails"
+**Solution**: Verify `GOOGLE_CLIENT_ID` in `.env` and ensure redirect URI matches
+
+## 📝 Contributing
+
+1. Create a feature branch: `git checkout -b feature/your-feature`
+2. Commit changes: `git commit -m "Add your feature"`
+3. Push to branch: `git push origin feature/your-feature`
+4. Open a Pull Request
+
+
