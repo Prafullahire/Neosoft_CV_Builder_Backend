@@ -7,9 +7,6 @@ const generateToken = (id) => {
     });
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
 const registerUser = async (req, res) => {
     const { username, email, password, contactNumber } = req.body;
 
@@ -42,9 +39,7 @@ const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
+
 const authUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -68,9 +63,7 @@ const authUser = async (req, res) => {
 
 const { OAuth2Client } = require('google-auth-library');
 
-// @desc    Google OAuth login
-// @route   POST /api/auth/google
-// @access  Public
+
 const googleAuth = async (req, res) => {
     const { tokenId } = req.body; // ID token from client
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -87,7 +80,7 @@ const googleAuth = async (req, res) => {
             user = await User.create({
                 username: name,
                 email,
-                password: googleId, // placeholder, not used for OAuth users
+                password: googleId, 
                 contactNumber: '',
                 googleId,
                 avatar: picture,
