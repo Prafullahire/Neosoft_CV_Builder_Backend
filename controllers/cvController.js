@@ -1,10 +1,12 @@
 const CV = require('../models/CV');
 
-// @desc    Create new CV
-// @route   POST /api/cvs
-// @access  Private
+
 const createCV = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
         const cv = await CV.create({
             user: req.user._id,
             ...req.body,
@@ -12,13 +14,28 @@ const createCV = async (req, res) => {
 
         res.status(201).json(cv);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        // Handle mongoose validation errors with 400 status
+        if (error.name === 'ValidationError') {
+            const errors = Object.keys(error.errors).map((key) => ({
+                field: key,
+                message: error.errors[key].message,
+            }));
+            console.error('ValidationError creating CV:', errors);
+            return res.status(400).json({ message: 'Validation error', errors });
+        }
+
+        // Handle duplicate key errors
+        if (error.code && error.code === 11000) {
+            console.error('Duplicate key error creating CV:', error.keyValue);
+            return res.status(400).json({ message: 'Duplicate value', details: error.keyValue });
+        }
+
+        console.error('Error creating CV:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-// @desc    Get all CVs for logged in user
-// @route   GET /api/cvs
-// @access  Private
+
 const getCVs = async (req, res) => {
     try {
         const cvs = await CV.find({ user: req.user._id }).sort({ updatedAt: -1 });
@@ -28,9 +45,7 @@ const getCVs = async (req, res) => {
     }
 };
 
-// @desc    Get single CV by ID
-// @route   GET /api/cvs/:id
-// @access  Private
+
 const getCVById = async (req, res) => {
     try {
         const cv = await CV.findById(req.params.id);
@@ -50,9 +65,6 @@ const getCVById = async (req, res) => {
     }
 };
 
-// @desc    Update CV
-// @route   PUT /api/cvs/:id
-// @access  Private
 const updateCV = async (req, res) => {
     try {
         const cv = await CV.findById(req.params.id);
@@ -78,9 +90,7 @@ const updateCV = async (req, res) => {
     }
 };
 
-// @desc    Delete CV
-// @route   DELETE /api/cvs/:id
-// @access  Private
+
 const deleteCV = async (req, res) => {
     try {
         const cv = await CV.findById(req.params.id);
@@ -102,9 +112,7 @@ const deleteCV = async (req, res) => {
     }
 };
 
-// @desc    Get public CV (for sharing)
-// @route   GET /api/cvs/public/:id
-// @access  Public
+
 const getPublicCV = async (req, res) => {
     try {
         const cv = await CV.findById(req.params.id);
