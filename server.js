@@ -12,7 +12,7 @@ connectDB();
 const app = express();
 
 app.use(cors());
-// Increase payload size limits to accept larger JSON bodies (e.g., file uploads encoded in base64)
+// Accepts large request bodies, like base64 profile images or PDF data.
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 

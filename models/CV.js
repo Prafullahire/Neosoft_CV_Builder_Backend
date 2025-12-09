@@ -22,6 +22,7 @@ const cvSchema = mongoose.Schema(
             pincode: { type: String },
             image: { type: String }, // URL or base64
             intro: { type: String },
+            designation: { type: String },
         },
         education: [
             {
