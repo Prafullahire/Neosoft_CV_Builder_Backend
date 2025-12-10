@@ -14,7 +14,6 @@ const createCV = async (req, res) => {
 
         res.status(201).json(cv);
     } catch (error) {
-        // Handle mongoose validation errors with 400 status
         if (error.name === 'ValidationError') {
             const errors = Object.keys(error.errors).map((key) => ({
                 field: key,
@@ -24,7 +23,6 @@ const createCV = async (req, res) => {
             return res.status(400).json({ message: 'Validation error', errors });
         }
 
-        // Handle duplicate key errors
         if (error.code && error.code === 11000) {
             console.error('Duplicate key error creating CV:', error.keyValue);
             return res.status(400).json({ message: 'Duplicate value', details: error.keyValue });
@@ -54,7 +52,6 @@ const getCVById = async (req, res) => {
             return res.status(404).json({ message: 'CV not found' });
         }
 
-        // Check if user owns this CV
         if (cv.user.toString() !== req.user._id.toString()) {
             return res.status(401).json({ message: 'Not authorized' });
         }

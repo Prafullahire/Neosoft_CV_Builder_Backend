@@ -14,7 +14,7 @@ const registerUser = async (req, res) => {
     try {
         if (!username || !email || !password) {
             return res.status(400).json({
-                message: 'Validation error',
+                message: 'Please fill in all required fields',
                 errors: [
                     !username && { field: 'username', message: 'Username is required' },
                     !email && { field: 'email', message: 'Email is required' },
@@ -43,7 +43,6 @@ const registerUser = async (req, res) => {
             token: generateToken(user._id),
         });
     } catch (error) {
-      console.log('ValidationError user:', error);
         if (error.name === 'ValidationError') {
             const errors = Object.keys(error.errors).map((key) => ({
                 field: key,
@@ -119,7 +118,6 @@ const googleAuth = async (req, res) => {
         let user = await User.findOne({ email });
 
         if (!user) {
-          console.log('Creating new user from Google auth:', { name, email, googleId, picture });
             user = await User.create({
                 username: name,
                 email,
@@ -128,7 +126,6 @@ const googleAuth = async (req, res) => {
                 googleId,
                 avatar: picture,
             });
-            console.log('New user created:', user);
         }
 
         return res.json({
@@ -139,15 +136,12 @@ const googleAuth = async (req, res) => {
             token: generateToken(user._id),
         });
     } catch (error) {
-              console.log('ValidationError user:', error);
-
-
         if (error.name === 'ValidationError') {
             const errors = Object.keys(error.errors).map((key) => ({
                 field: key,
                 message: error.errors[key].message,
             }));
-            return res.status(400).json({ message: 'Validation error', errors });
+            return res.status(400).json({ message: 'Please Fill all required fields', errors });
         }
 
         if (error.code === 11000) {
