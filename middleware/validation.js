@@ -1,6 +1,5 @@
 const { body, validationResult } = require('express-validator');
 
-// Validation middleware to handle errors
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -15,7 +14,6 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// Register validation rules
 const validateRegister = [
     body('username')
         .trim()
@@ -39,7 +37,6 @@ const validateRegister = [
     handleValidationErrors
 ];
 
-// Login validation rules
 const validateLogin = [
     body('email')
         .trim()
@@ -52,7 +49,6 @@ const validateLogin = [
     handleValidationErrors
 ];
 
-// Google OAuth validation rules
 const validateGoogleAuth = [
     body('tokenId')
         .notEmpty().withMessage('Google token is required')
