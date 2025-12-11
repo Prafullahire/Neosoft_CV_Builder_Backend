@@ -12,18 +12,38 @@ const registerUser = async (req, res) => {
   const { username, email, password, contactNumber } = req.body;
 
   try {
-    if (!username || !email || !password) {
+    let errors = [];
+
+    if (!username || !username.trim()) {
+      errors.push({ field: "username", message: "Username is required" });
+    }
+
+    if (!email || !email.trim()) {
+      errors.push({ field: "email", message: "Email is required" });
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        errors.push({ field: "email", message: "Invalid email address" });
+      }
+    }
+    if (!password) {
+      errors.push({ field: "password", message: "Password is required" });
+    } else if (password.length < 6) {
+      errors.push({
+        field: "password",
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    if (errors.length > 0) {
       return res.status(400).json({
-        message: "Please fill in all required fields",
-        errors: [
-          !username && { field: "username", message: "Username is required" },
-          !email && { field: "email", message: "Email is required" },
-          !password && { field: "password", message: "Password is required" },
-        ].filter(Boolean),
+        message: "Validation error",
+        errors,
       });
     }
 
     const userExists = await User.findOne({ email });
+
     if (userExists) {
       return res
         .status(400)
@@ -80,12 +100,12 @@ const authUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(404).json({ message: "Email not found" });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Incorrect password" });
     }
 
     return res.json({

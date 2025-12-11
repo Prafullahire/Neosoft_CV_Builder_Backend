@@ -8,7 +8,6 @@ const connectDB = async () => {
     const host = process.env.DB_HOST;
 
     const mongoURI = `mongodb+srv://${user}:${pass}@${host}/${dbName}?retryWrites=true&w=majority`;
-
     const conn = await mongoose.connect(mongoURI); 
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
